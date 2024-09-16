@@ -1,0 +1,30 @@
+# Choose your base image wisely (like selecting a trusty steed).
+# Here, we ride upon the noble .NET SDK 8.0.
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Set your working directory within the container.
+WORKDIR /source
+
+# Copy your .sln file (the ancient scrolls of your project).
+COPY *.sln .
+
+# Restore the magical dependencies (restore as distinct layers).
+RUN dotnet restore -a $TARGETARCH
+
+# Copy everything else (your source code, libraries, and artifacts).
+COPY . .
+
+# Build your app (like forging a legendary sword).
+RUN dotnet publish -a $TARGETARCH --self-contained false --no-restore -o /app
+
+# Now, behold! The final image emerges.
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+
+# Set sail to port 8080 (because 8080 is the new 80 in .NET 8).
+EXPOSE 8080
+
+# Navigate to the app's lair.
+WORKDIR /app
+
+# Unleash the app upon the world!
+CMD ["dotnet", "webapp.dll"]
